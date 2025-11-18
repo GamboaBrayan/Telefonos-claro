@@ -42,7 +42,7 @@ import appleLogo from '../assets/Iphone.png'
 import xiaomiLogo from '../assets/Xiaomi.png'
 import motorolaLogo from '../assets/Motorola.png'
 import huaweiLogo from '../assets/Huawei.png'
-import honorLogo from '../assets/honor.png'
+import honorLogo from '../assets/Honor.png'
 import oppoLogo from '../assets/Oppo.png'
 import zteLogo from '../assets/ZTE.png'
 
