@@ -1,0 +1,16 @@
+# Configuración de build
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Redirects para SPA (Single Page Application)
+# Esto hace que todas las rutas redirijan a index.html
+# para que Vue Router pueda manejar la navegación
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Variables de entorno de build
+[build.environment]
+  NODE_VERSION = "20.19.0"
