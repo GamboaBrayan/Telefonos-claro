@@ -235,15 +235,17 @@ const handleImageError = (event) => {
 }
 
 .card-value {
-  color: #6b7280;
+  color: #000000;
   margin-left: 8px;
+  font-weight: bold;
 }
 
 .card-plans {
-  color: #6b7280;
+  color: #000000;
   margin-top: 4px;
   font-size: 12px;
   line-height: 1.6;
+  font-weight: bold;
 }
 
 .card-price-section {

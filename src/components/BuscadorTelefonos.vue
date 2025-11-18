@@ -299,8 +299,8 @@ watch([searchTerm, selectedCampaign], () => {
 }
 
 .company-logo {
-  height: 48px;
-  max-height: 48px;
+  height: 92px;
+  max-height: 92px;
   width: auto;
   object-fit: contain;
   cursor: pointer;
