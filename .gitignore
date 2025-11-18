@@ -25,6 +25,3 @@ dist-ssr
 
 
 .env
-*.csv
-/public/*.csv
-CAMPANA_PRECIOS.csv
