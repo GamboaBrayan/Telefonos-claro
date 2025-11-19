@@ -2,15 +2,25 @@
   <div class="container">
     <div class="header-row">
       <h1 class="title">Buscador de Teléfonos</h1>
-      
-      <div class="logo-wrapper" ref="logoRef">
-        <img src="/Claro.svg.png" alt="Logo Empresa" class="company-logo" @click="toggleMenu" />
 
-        <div v-if="showMenu" ref="menuRef" class="logo-menu" role="menu" aria-label="Menú de usuario">
-          <button class="menu-item" @click="logout">Cerrar sesión</button>
+      <div class="header-actions">
+        <label class="upload-button">
+          Subir CSV
+          <input type="file" accept=".csv" @change="handleFileChange" class="hidden-file-input" />
+        </label>
+        <span v-if="uploadedFileName" class="uploaded-name-header">{{ uploadedFileName }}</span>
+
+        <div class="logo-wrapper" ref="logoRef">
+          <img src="/Claro.svg.png" alt="Logo Empresa" class="company-logo" @click="toggleMenu" />
+
+          <div v-if="showMenu" ref="menuRef" class="logo-menu" role="menu" aria-label="Menú de usuario">
+            <button class="menu-item" @click="logout">Cerrar sesión</button>
+          </div>
         </div>
       </div>
     </div>
+
+    
 
     <div class="search-box">
       <div class="filters-grid">
@@ -54,8 +64,14 @@
     </div>
 
     <div class="no-results" v-else-if="!isLoading && filteredPhones.length === 0">
-      <p class="no-results-title">No se encontraron resultados</p>
-      <p class="no-results-subtitle">Intenta con otros términos de búsqueda</p>
+      <template v-if="!uploadedFileName">
+        <p class="no-results-title">No hay datos cargados</p>
+        <p class="no-results-subtitle">Sube un archivo CSV usando el botón "Subir CSV" junto al logo.</p>
+      </template>
+      <template v-else>
+        <p class="no-results-title">No se encontraron resultados</p>
+        <p class="no-results-subtitle">Intenta con otros términos de búsqueda</p>
+      </template>
     </div>
     
     <div class="cards-grid" v-else>
@@ -127,12 +143,13 @@ const searchTerm = ref('')
 const selectedCampaign = ref('')
 const currentPage = ref(1)
 const itemsPerPage = 50
-const isLoading = ref(true)
+const isLoading = ref(false)
 const hasError = ref(false)
 const showMenu = ref(false)
 const logoRef = ref(null)
 const menuRef = ref(null)
 const router = useRouter()
+const uploadedFileName = ref('')
 
 const loadCSV = () => {
   fetch('/CAMPANA_PRECIOS.csv')
@@ -161,6 +178,40 @@ const loadCSV = () => {
       hasError.value = true
       isLoading.value = false
     })
+}
+
+// Manejar archivo CSV subido por el usuario
+const handleFileChange = (event) => {
+  const file = event.target.files?.[0]
+  if (!file) return
+
+  uploadedFileName.value = file.name
+  isLoading.value = true
+  hasError.value = false
+
+  Papa.parse(file, {
+    header: true,
+    skipEmptyLines: true,
+    complete: (results) => {
+      allData.value = results.data
+      populateCampaigns(results.data)
+      isLoading.value = false
+    },
+    error: (error) => {
+      console.error('Error al parsear CSV subido:', error)
+      hasError.value = true
+      isLoading.value = false
+    }
+  })
+}
+
+const clearUploaded = () => {
+  uploadedFileName.value = ''
+  // Limpiar datos y mostrar estado inicial (sin CSV cargado)
+  allData.value = []
+  campaigns.value = []
+  isLoading.value = false
+  hasError.value = false
 }
 
 const populateCampaigns = (data) => {
@@ -234,7 +285,7 @@ const handleDocumentClick = (e) => {
 }
 
 onMounted(() => {
-  loadCSV()
+  // No cargar CSV por defecto: esperar a que el usuario suba uno
   document.addEventListener('click', handleDocumentClick)
 })
 
@@ -271,7 +322,6 @@ const logout = async () => {
   }
 }
 
-// ARREGLADO: El watch resetea la página solo cuando cambian los filtros
 watch([searchTerm, selectedCampaign], () => {
   currentPage.value = 1
 })
@@ -314,6 +364,33 @@ watch([searchTerm, selectedCampaign], () => {
 .logo-wrapper {
   position: relative;
   display: inline-block;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.upload-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.hidden-file-input {
+  display: none;
+}
+
+.uploaded-name-header {
+  font-size: 13px;
+  color: #6b7280;
 }
 
 .logo-menu {
@@ -551,6 +628,35 @@ watch([searchTerm, selectedCampaign], () => {
   background: white;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.upload-row {
+  background: #fff;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.upload-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.uploaded-name {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.clear-upload {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: white;
+  cursor: pointer;
 }
 
 .no-results-title {
